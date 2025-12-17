@@ -1,0 +1,31 @@
+import { getAuth } from "@clerk/express";
+import type { Request, Response } from "express";
+import { prisma } from "../../lib/prisma";
+
+const userProfile = async (req: Request, res: Response) => {
+  const { isAuthenticated, userId } = getAuth(req);
+  if (!isAuthenticated) {
+    return res.status(401).json({ error: "User not authenticated" });
+  }
+
+  try {
+    const user = await prisma.user.findUnique({
+      where: {
+        clerkId: userId,
+      },
+    });
+    if (!user) {
+      return res.status(404).json({ error: "User not found!!" });
+    }
+
+    return res.status(200).json({ success: true, user });
+  } catch (error) {
+    return res
+      .status(500)
+      .json({ error: "Error while fetching user profile!!" });
+  }
+};
+
+
+
+export default userProfile;
