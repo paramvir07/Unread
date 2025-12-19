@@ -13,12 +13,11 @@ import axios from "axios";
 import type { User } from "@/pages/Home";
 import { chatIdAtom, otherUserIdAtom } from "@/atoms/atoms";
 import { useSetAtom } from "jotai";
-import { MySkeleton } from "../MySkeleton";
-import { Skeleton } from "../ui/skeleton";
+import { MySkeleton } from "../ui/MySkeleton";
 
 type ChatHomeProps = {
-  users: User[]
-  loadingUsers: boolean
+  users: User[];
+  loadingUsers: boolean;
 };
 
 const UserList = ({ users, loadingUsers }: ChatHomeProps) => {
@@ -127,13 +126,9 @@ const UserList = ({ users, loadingUsers }: ChatHomeProps) => {
 
             {/* Signed in list */}
             {isLoaded && isSignedIn && (
-              
               <>
-                {loadingUsers && <Skeleton />}
-                
-                {users.map((user) => {
-                  
 
+                {users.map((user) => {
                   return (
                     <button
                       key={user.id}
@@ -143,7 +138,6 @@ const UserList = ({ users, loadingUsers }: ChatHomeProps) => {
                     >
                       <Avatar className="h-10 w-10 shrink-0">
                         <AvatarImage alt={user.username} src={user.imageUrl} />
-                        
                       </Avatar>
 
                       <div className="flex-1 min-w-0">
@@ -163,16 +157,7 @@ const UserList = ({ users, loadingUsers }: ChatHomeProps) => {
                   );
                 })}
 
-                {users.length === 0 && (
-                  <div className="p-6">
-                    <div className="rounded-xl border bg-muted/30 p-5 text-center">
-                      <p className="text-sm font-medium">No chats yet</p>
-                      <p className="mt-1 text-xs text-muted-foreground">
-                        Search for a user to start your first chat.
-                      </p>
-                    </div>
-                  </div>
-                )}
+                {users.length === 0 && <MySkeleton />}
               </>
             )}
           </div>

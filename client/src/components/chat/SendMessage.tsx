@@ -5,6 +5,7 @@ import EmojiPicker, { type EmojiClickData } from "emoji-picker-react";
 
 const SendMessage = ({ sendMessage }: { sendMessage: (t: string) => void }) => {
   const [message, setMessage] = useState("");
+  const [check, setcheck] = useState("");
   const [emojiPicker, setEmojiPicker] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
 
@@ -36,12 +37,10 @@ const SendMessage = ({ sendMessage }: { sendMessage: (t: string) => void }) => {
   };
   return (
     <>
+      {message && <div>hlo ji</div>}
+
       {emojiPicker && (
-        <EmojiPicker
-          onEmojiClick={onEmojiCLick}
-          theme="dark"
-          height={320}
-        />
+        <EmojiPicker onEmojiClick={onEmojiCLick} theme="dark" height={320} />
       )}
       <div className="flex items-center gap-2 px-2 py-2 border-t">
         <Smile onClick={() => setEmojiPicker((v) => !v)} />

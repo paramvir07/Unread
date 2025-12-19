@@ -32,14 +32,14 @@ export const setupSocket = (server: HttpServer) => {
     console.log(
       `Socket connected with socket id: ${socket.id} and clerk id: ${socket.data.clerkId}`
     );
-    socket.on("join-room", async ({ chatId, clerkId }) => {
+    socket.on("join-room", async ({ chatId }) => {
       if (!chatId) return console.log({ error: "Chat id not found!!" });
       socket.join(chatId);
       console.log(`Clerk user ${socket.data.clerkId} joined room ${chatId}`);
       try {
         const user = await prisma.user.findUnique({
           where: {
-            clerkId,
+            clerkId : socket.data.clerkId,
           },
         });
 
@@ -59,11 +59,11 @@ export const setupSocket = (server: HttpServer) => {
       }
     });
 
-    socket.on("send-message", async ({ clerkId, chatId, message }) => {
+    socket.on("send-message", async ({ chatId, message }) => {
       try {
         const user = await prisma.user.findUnique({
           where: {
-            clerkId,
+            clerkId: socket.data.clerkId,
           },
         });
 
@@ -88,6 +88,12 @@ export const setupSocket = (server: HttpServer) => {
         });
       }
     });
+
+    socket.on('leave-room', ({chatId}) => {  
+      if (!chatId) return console.log({ error: "Chat id not found!!" });
+      socket.leave(chatId);
+      console.log(`Clerk user ${socket.data.clerkId} left room ${chatId}`);
+    })
 
     socket.on("disconnect", () => {
       console.log(`Socket disconnected: ${socket.id}`);

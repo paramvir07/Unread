@@ -1,4 +1,5 @@
-import { Skeleton } from "./ui/skeleton";
+import { Skeleton } from "./skeleton";
+
 
 export const MySkeleton = () => {
   return (

@@ -3,6 +3,7 @@ import { ScrollArea } from "../ui/scroll-area";
 import { useAtom } from "jotai";
 import { chatMessagesAtom} from "@/atoms/atoms";
 import { useEffect, useRef } from "react";
+import TypingIndicator from "./TypingIndicator";
 
 
 type ChatAreaProps = {
@@ -61,13 +62,21 @@ const ChatArea = ({ chatData }: ChatAreaProps) => {
   return (
     <div className="flex-1 overflow-hidden">
       <ScrollArea className="p-4 w-full h-full">
-        {messages.map((m,index) => {
+        {messages.map((m, index) => {
           const isMe = m.userId === loggedInUser;
-          
+
           return (
-              <MessageBubble key={index} isMe={isMe} message={m.content} createdAt={m.createdAt}/>
+            <MessageBubble
+              key={index}
+              isMe={isMe}
+              message={m.content}
+              createdAt={m.createdAt}
+            />
           );
         })}
+
+        <TypingIndicator />
+
         <div ref={bottomRef} />
       </ScrollArea>
     </div>

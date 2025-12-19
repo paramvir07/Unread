@@ -7,15 +7,15 @@ import {
 import ChatArea from "@/components/chat/ChatArea";
 import Header from "@/components/chat/Header";
 import SendMessage from "@/components/chat/SendMessage";
-import { getSocket } from "@/socket/socket";
+import { disconnectSocket, getSocket } from "@/socket/socket";
 import axios from "axios";
 import { useAtom, useSetAtom } from "jotai";
 import { useEffect, useRef, useState } from "react";
 import { useParams } from "react-router";
-import { MySkeleton } from "@/components/MySkeleton";
 import type { User } from "./Home";
 import { useAuth } from "@clerk/clerk-react";
 import type { Socket } from "socket.io-client";
+import { MySkeleton } from "@/components/ui/MySkeleton";
 
 type ChatUser = {
   id: string;
@@ -62,8 +62,8 @@ const Chat = () => {
   const [clerkId] = useAtom(clerkIdAtom);
   const setMessages = useSetAtom(chatMessagesAtom);
   const { chatId } = useParams();
-  const { getToken } = useAuth();
-  const socketRef =useRef<Socket | null>(null)
+  const { getToken, isLoaded, userId } = useAuth();
+  const socketRef = useRef<Socket | null>(null);
 
   const loadChat = async () => {
     try {
@@ -79,14 +79,12 @@ const Chat = () => {
     }
   };
 
- 
-
   const socketSetup = async () => {
     const token = await getToken();
     const socket = getSocket(token);
     socketRef.current = socket;
     try {
-      socket.emit("join-room", { chatId, clerkId });
+      socket.emit("join-room", { chatId });
       console.log(`Joined room: ${chatId}`);
 
       socket.on("check-online", ({ userId }) => {
@@ -97,10 +95,6 @@ const Chat = () => {
       socket.on("chat-message", ({ message }) => {
         setMessages((prev) => [...prev, message]);
       });
-      return () => {
-        socket?.emit("leave-room", { chatId });
-        console.log(`Left room: ${chatId}`);
-      };
     } catch (error) {
       console.error("Socket error:", error);
     }
@@ -108,20 +102,25 @@ const Chat = () => {
 
   const sendMessage = (message: string) => {
     socketRef.current?.emit("send-message", {
-      clerkId,
       chatId,
-      otherUserId,
       message,
     });
   };
 
   useEffect(() => {
-    if (!chatId) return;
+    if (!chatId || !isLoaded || !userId) return;
 
     loadChat();
 
     socketSetup();
-  }, [chatId]);
+
+    return () => {
+      socketRef.current?.emit("leave-room", { chatId });
+      socketRef.current?.off("check-online");
+      socketRef.current?.off("chat-message");
+      console.log(`Left room: ${chatId}`);
+    };
+  }, [chatId, isLoaded, userId]);
 
   return (
     <>
