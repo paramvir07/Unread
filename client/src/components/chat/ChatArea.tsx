@@ -1,7 +1,7 @@
 import type { ChatData } from "@/pages/Chat";
 import { ScrollArea } from "../ui/scroll-area";
 import { useAtom } from "jotai";
-import { chatMessagesAtom } from "@/atoms/atoms";
+import { chatMessagesAtom} from "@/atoms/atoms";
 import { useEffect, useRef } from "react";
 
 
@@ -50,7 +50,7 @@ const ChatArea = ({ chatData }: ChatAreaProps) => {
   }, [])
 
   useEffect(() => {
-  // if (!bottomRef.current) return
+  if (!bottomRef.current) return
 
   bottomRef.current?.scrollIntoView({
     behavior: "smooth",

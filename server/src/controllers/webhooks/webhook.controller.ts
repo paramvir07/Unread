@@ -42,7 +42,7 @@ const handleWebhook = async (req: Request, res: Response) => {
 async function handleUserCreated(evt: WebhookEvent) {
     if (evt.type !== "user.created") return;
 
-  const { id, first_name, last_name, username, email_addresses } = evt.data;
+  const { id, first_name, last_name, username, email_addresses, image_url } = evt.data;
 
   try {
     const user = await prisma.user.create({
@@ -51,7 +51,8 @@ async function handleUserCreated(evt: WebhookEvent) {
         username: username || "",
         firstname: first_name || "",
         lastname: last_name || "",
-        email: email_addresses?.[0]?.email_address || ""
+        email: email_addresses?.[0]?.email_address || "",
+        imageUrl: image_url
       },
     });
     
@@ -65,7 +66,7 @@ async function handleUserCreated(evt: WebhookEvent) {
 // Handler for user.updated
 async function handleUserUpdated(evt: WebhookEvent) {
      if (evt.type !== "user.updated") return;
-  const { id, first_name, last_name, username, email_addresses } = evt.data;
+  const { id, first_name, last_name, username, email_addresses, image_url} = evt.data;
 
   try {
     const user = await prisma.user.update({
@@ -74,7 +75,8 @@ async function handleUserUpdated(evt: WebhookEvent) {
         username: username || "",
         firstname: first_name || "",
         lastname: last_name,
-        email: email_addresses?.[0]?.email_address || ""
+        email: email_addresses?.[0]?.email_address || "",
+        imageUrl: image_url
       },
     });
     

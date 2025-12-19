@@ -1,24 +1,29 @@
 
 import { useEffect } from "react";
-import { useUser } from "@clerk/clerk-react";
 import { connectSocket } from "./socket/socket";
 import { useSetAtom } from "jotai";
 import { clerkIdAtom } from "./atoms/atoms";
 import Home from "./pages/Home";
+import { useAuth } from "@clerk/clerk-react";
 
 function App() {
-  const { user, isLoaded, isSignedIn } = useUser();
+  const { isLoaded, isSignedIn, getToken ,userId} = useAuth();
   const setClerkId = useSetAtom(clerkIdAtom);
 
+  const connectToSocket = async () => {
+    if (!isLoaded || !isSignedIn) return;
+
+    setClerkId(userId);
+
+    const token = await getToken();
+    connectSocket(token);
+    console.log(`Socket connected with clerk id: ${userId}`);
+  }
+  
   useEffect(() => {
-    if (!isLoaded || !isSignedIn || !user) return;
+    connectToSocket();
 
-    setClerkId(user.id);
-
-    connectSocket(user.id);
-    console.log(`Socket connected with clerk id: ${user.id}`);
-
-  }, [isLoaded, isSignedIn, user?.id, setClerkId]);
+  }, [isLoaded, isSignedIn, userId, setClerkId]);
 
   return (
     <>

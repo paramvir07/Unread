@@ -5,8 +5,7 @@ import "./index.css";
 import App from "./App.tsx";
 import { ClerkProvider} from "@clerk/clerk-react";
 import Chat from "./pages/Chat.tsx";
-import {TestMain} from "./components/test/TestMain.tsx";
-import JotaiTest from "./components/test2/JotaiTest.tsx";
+import { shadcn } from "@clerk/themes";
 
 const PUBLISHABLE_KEY = import.meta.env.VITE_CLERK_PUBLISHABLE_KEY
 
@@ -24,14 +23,6 @@ let router = createBrowserRouter([
   {
     path: "/chat/:chatId",
     Component: Chat
-  },
-  {
-    path: "/test",
-    Component: TestMain
-  },
-  {
-    path: "/jotaiTest",
-    Component: JotaiTest
   }
 ]); 
 
@@ -39,8 +30,11 @@ let router = createBrowserRouter([
 
 createRoot(document.getElementById("root")!).render(
   <>
-      <ClerkProvider publishableKey={PUBLISHABLE_KEY}>
+    <ClerkProvider
+      publishableKey={PUBLISHABLE_KEY}
+      appearance={{ theme: shadcn }}
+    >
       <RouterProvider router={router} />
-      </ClerkProvider>
+    </ClerkProvider>
   </>
 );

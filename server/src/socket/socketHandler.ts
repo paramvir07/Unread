@@ -1,7 +1,8 @@
 import { Server } from "socket.io";
 import { Server as HttpServer } from "http";
 import { prisma } from "../lib/prisma";
-import { error } from "console";
+import { verifyToken } from "@clerk/backend";
+import 'dotenv/config'
 
 export const setupSocket = (server: HttpServer) => {
   const io = new Server(server, {
@@ -10,10 +11,22 @@ export const setupSocket = (server: HttpServer) => {
       credentials: true,
     },
   });
-  io.use((socket, next) => {
-    const clerkId = socket.handshake.auth.clerkId;
-    socket.data.clerkId = clerkId;
-    next();
+  io.use(async(socket, next) => {
+    const token = socket.handshake.auth.token;
+
+    if (!token) return next(new Error("UNAUTHORIZED"));
+
+    try {
+      const verified = await verifyToken(token, {
+        secretKey: process.env.CLERK_SECRET_KEY,
+        authorizedParties: ["http://localhost:5173"]
+      });
+      socket.data.clerkId = verified.sub;
+      return next();
+    } catch (error) {
+      return next(new Error("UNAUTHORIZED"));
+    }
+    
   });
   io.on("connection", (socket) => {
     console.log(

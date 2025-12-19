@@ -12,8 +12,8 @@ router.post(
   express.raw({ type: "application/json" }),
   handleWebhook
 );
-router.get("/user/profile", userProfile);
+router.get("/user/profile",authMiddleware.getAuthenticatedUser, userProfile);
 router.post("/user/getChatId", authMiddleware.getAuthenticatedUser, loadChat.getChatId);
 router.post("/user/loadChat",authMiddleware.getAuthenticatedUser, loadChat.loadChat);
-router.get("/getUsers", getUsers);
+router.get("/getUsers",authMiddleware.getAuthenticatedUser, getUsers);
 export default router;
