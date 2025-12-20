@@ -22,6 +22,7 @@ model User {
   email     String  @unique
   role      Role    @default(USER)
   imageUrl  String
+  isOnline Boolean @default(false)
 
   chatUsers ChatUser[]
 

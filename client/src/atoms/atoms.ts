@@ -13,8 +13,6 @@ export const otherUserIdAtom = atom<string | null>(null);
 
 export const chatIdAtom = atom<string | null>(null);
 
-export const onlineUserAtom = atom<Boolean>(false);
-
 export const isTypingAtom = atom<boolean>(false);
 
 export const showTypingIndicatorAtom = atom<boolean>(false);

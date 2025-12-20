@@ -2,12 +2,13 @@ import {
   SignedIn,
   SignedOut,
   SignInButton,
+  useAuth,
   UserButton,
   useUser,
 } from "@clerk/clerk-react";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Input } from "@/components/ui/input";
-import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
+import { Avatar, AvatarImage } from "@/components/ui/avatar";
 import { useNavigate } from "react-router";
 import axios from "axios";
 import type { User } from "@/pages/Home";
@@ -17,14 +18,15 @@ import { MySkeleton } from "../ui/MySkeleton";
 
 type ChatHomeProps = {
   users: User[];
-  loadingUsers: boolean;
 };
 
-const UserList = ({ users, loadingUsers }: ChatHomeProps) => {
+const UserList = ({ users }: ChatHomeProps) => {
+  const { userId } = useAuth();
   const setOtherUserId = useSetAtom(otherUserIdAtom);
   const setChatId = useSetAtom(chatIdAtom);
   const navigate = useNavigate();
   const { isLoaded, isSignedIn } = useUser();
+  const apiUrl = import.meta.env.VITE_API_URL;
 
   const getChatId = async (otherUserId: string) => {
     // Hard block clicks when signed out (important)
@@ -34,7 +36,7 @@ const UserList = ({ users, loadingUsers }: ChatHomeProps) => {
 
     try {
       const response = await axios.post(
-        "http://localhost:3000/api/user/getChatId",
+        `${apiUrl}/api/user/getChatId`,
         { otherUserId },
         { withCredentials: true }
       );
@@ -127,35 +129,39 @@ const UserList = ({ users, loadingUsers }: ChatHomeProps) => {
             {/* Signed in list */}
             {isLoaded && isSignedIn && (
               <>
+                {users
+                  .filter((u) => u.clerkId !== userId)
+                  .map((user) => {
+                    return (
+                      <button
+                        key={user.id}
+                        onClick={() => getChatId(user.id)}
+                        type="button"
+                        className="flex w-full items-center gap-3 px-4 py-3 border-b last:border-b-0 cursor-pointer hover:bg-muted/70 focus:outline-none focus:bg-muted/80"
+                      >
+                        <Avatar className="h-10 w-10 shrink-0">
+                          <AvatarImage
+                            alt={user.username}
+                            src={user.imageUrl}
+                          />
+                        </Avatar>
 
-                {users.map((user) => {
-                  return (
-                    <button
-                      key={user.id}
-                      onClick={() => getChatId(user.id)}
-                      type="button"
-                      className="flex w-full items-center gap-3 px-4 py-3 border-b last:border-b-0 cursor-pointer hover:bg-muted/70 focus:outline-none focus:bg-muted/80"
-                    >
-                      <Avatar className="h-10 w-10 shrink-0">
-                        <AvatarImage alt={user.username} src={user.imageUrl} />
-                      </Avatar>
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-center justify-between gap-2">
+                            <p className="text-sm font-medium truncate">
+                              {user.firstname} {user.lastname}
+                            </p>
+                          </div>
 
-                      <div className="flex-1 min-w-0">
-                        <div className="flex items-center justify-between gap-2">
-                          <p className="text-sm font-medium truncate">
-                            {user.firstname} {user.lastname}
-                          </p>
+                          <div className="mt-0.5 flex items-center justify-between gap-2">
+                            <p className="text-xs text-muted-foreground truncate">
+                              @{user.username}
+                            </p>
+                          </div>
                         </div>
-
-                        <div className="mt-0.5 flex items-center justify-between gap-2">
-                          <p className="text-xs text-muted-foreground truncate">
-                            @{user.username}
-                          </p>
-                        </div>
-                      </div>
-                    </button>
-                  );
-                })}
+                      </button>
+                    );
+                  })}
 
                 {users.length === 0 && <MySkeleton />}
               </>

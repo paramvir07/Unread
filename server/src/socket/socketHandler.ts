@@ -29,35 +29,36 @@ export const setupSocket = (server: HttpServer) => {
     }
   });
 
-  io.on("connection", (socket) => {
+  io.on("connection", async(socket) => {
     console.log(
       `Socket connected with socket id: ${socket.id} and clerk id: ${socket.data.clerkId}`
     );
-    socket.on("join-room", async ({ chatId }) => {
+          try {
+            const user = await prisma.user.update({
+              where: {
+                clerkId: socket.data.clerkId,
+              },
+              data: {
+                isOnline: true
+              }
+            });
+
+            if (!user)
+              return console.log({
+                error: "User not found setting isOnline flag!!",
+              });
+
+          } catch (err) {
+            console.error({
+              error: "Error while sending setting isOnline flag!!!",
+              message: err,
+            });
+          }
+    socket.on("join-room", ({ chatId }) => {
       if (!chatId) return console.log({ error: "Chat id not found!!" });
       socket.join(chatId);
       console.log(`Clerk user ${socket.data.clerkId} joined room ${chatId}`);
-      try {
-        const user = await prisma.user.findUnique({
-          where: {
-            clerkId : socket.data.clerkId,
-          },
-        });
 
-        if (!user)
-          return console.log({
-            error: "User not found during sending message!!",
-          });
-
-        socket
-          .to(chatId)
-          .emit("check-online", { userId: user.id });
-      } catch (err) {
-        console.error({
-          error: "Error while sending message at backend!!",
-          message: err,
-        });
-      }
     });
 
     socket.on("send-message", async ({ chatId, message }) => {
@@ -105,8 +106,28 @@ export const setupSocket = (server: HttpServer) => {
     });
 
 
-    socket.on("disconnect", () => {
+    socket.on("disconnect", async() => {
       console.log(`Socket disconnected: ${socket.id}`);
+      try {
+        const user = await prisma.user.update({
+          where: {
+            clerkId: socket.data.clerkId,
+          },
+          data: {
+            isOnline: false,
+          },
+        });
+
+        if (!user)
+          return console.log({
+            error: "User not found setting isOnline flag!!",
+          });
+      } catch (err) {
+        console.error({
+          error: "Error while sending setting isOnline flag!!!",
+          message: err,
+        });
+      }
     });
   });
   return io;

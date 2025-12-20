@@ -1,7 +1,6 @@
 import {
   chatMessagesAtom,
   isTypingAtom,
-  onlineUserAtom,
   showTypingIndicatorAtom,
 } from "@/atoms/atoms";
 import ChatArea from "@/components/chat/ChatArea";
@@ -56,7 +55,6 @@ export type ChatData = {
 };
 
 const Chat = () => {
-  const setOnlineUser= useSetAtom(onlineUserAtom);
   const [chatData, setChatData] = useState<ChatData | null>(null);
   const setMessages = useSetAtom(chatMessagesAtom);
   const { chatId } = useParams();
@@ -64,11 +62,12 @@ const Chat = () => {
   const socketRef = useRef<Socket | null>(null);
   const [isTyping] = useAtom(isTypingAtom);
   const setShowTypingIndicator = useSetAtom(showTypingIndicatorAtom);
+  const apiUrl = import.meta.env.VITE_API_URL;
 
   const loadChat = async () => {
     try {
       const response = await axios.post(
-        "http://localhost:3000/api/user/loadChat",
+        `${apiUrl}/api/user/loadChat`,
         { chatId },
         { withCredentials: true }
       );
@@ -86,11 +85,6 @@ const Chat = () => {
     try {
       socket.emit("join-room", { chatId });
       console.log(`Joined room: ${chatId}`);
-
-      socket.on("check-online", ({ userId }) => {
-        setOnlineUser(true);
-        console.log("user is online bro");
-      });
 
       socket.on("is-typing", () => {
         setShowTypingIndicator(true);
