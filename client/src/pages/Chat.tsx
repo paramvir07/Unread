@@ -1,13 +1,13 @@
 import {
   chatMessagesAtom,
-  clerkIdAtom,
-  onlineUserIdAtom,
-  otherUserIdAtom,
+  isTypingAtom,
+  onlineUserAtom,
+  showTypingIndicatorAtom,
 } from "@/atoms/atoms";
 import ChatArea from "@/components/chat/ChatArea";
 import Header from "@/components/chat/Header";
 import SendMessage from "@/components/chat/SendMessage";
-import { disconnectSocket, getSocket } from "@/socket/socket";
+import {  getSocket } from "@/socket/socket";
 import axios from "axios";
 import { useAtom, useSetAtom } from "jotai";
 import { useEffect, useRef, useState } from "react";
@@ -56,14 +56,14 @@ export type ChatData = {
 };
 
 const Chat = () => {
-  const [otherUserId] = useAtom(otherUserIdAtom);
-  const setOnlineUserId = useSetAtom(onlineUserIdAtom);
+  const setOnlineUser= useSetAtom(onlineUserAtom);
   const [chatData, setChatData] = useState<ChatData | null>(null);
-  const [clerkId] = useAtom(clerkIdAtom);
   const setMessages = useSetAtom(chatMessagesAtom);
   const { chatId } = useParams();
   const { getToken, isLoaded, userId } = useAuth();
   const socketRef = useRef<Socket | null>(null);
+  const [isTyping] = useAtom(isTypingAtom);
+  const setShowTypingIndicator = useSetAtom(showTypingIndicatorAtom);
 
   const loadChat = async () => {
     try {
@@ -88,12 +88,21 @@ const Chat = () => {
       console.log(`Joined room: ${chatId}`);
 
       socket.on("check-online", ({ userId }) => {
-        setOnlineUserId(userId);
+        setOnlineUser(true);
         console.log("user is online bro");
+      });
+
+      socket.on("is-typing", () => {
+        setShowTypingIndicator(true);
+      });
+
+      socket.on("not-typing", () => {
+        setShowTypingIndicator(false);
       });
 
       socket.on("chat-message", ({ message }) => {
         setMessages((prev) => [...prev, message]);
+        setShowTypingIndicator(false);
       });
     } catch (error) {
       console.error("Socket error:", error);
@@ -118,9 +127,19 @@ const Chat = () => {
       socketRef.current?.emit("leave-room", { chatId });
       socketRef.current?.off("check-online");
       socketRef.current?.off("chat-message");
+      socketRef.current?.off("is-typing");
+      socketRef.current?.off("not-typing");
       console.log(`Left room: ${chatId}`);
     };
   }, [chatId, isLoaded, userId]);
+
+
+  // User Typing
+  useEffect(() => {
+    isTyping && socketRef.current?.emit("is-typing", { chatId });
+
+    !isTyping && socketRef.current?.emit("not-typing", { chatId });
+  }, [isTyping]);
 
   return (
     <>

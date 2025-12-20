@@ -11,6 +11,7 @@ export const setupSocket = (server: HttpServer) => {
       credentials: true,
     },
   });
+
   io.use(async(socket, next) => {
     const token = socket.handshake.auth.token;
 
@@ -26,8 +27,8 @@ export const setupSocket = (server: HttpServer) => {
     } catch (error) {
       return next(new Error("UNAUTHORIZED"));
     }
-    
   });
+
   io.on("connection", (socket) => {
     console.log(
       `Socket connected with socket id: ${socket.id} and clerk id: ${socket.data.clerkId}`
@@ -94,6 +95,15 @@ export const setupSocket = (server: HttpServer) => {
       socket.leave(chatId);
       console.log(`Clerk user ${socket.data.clerkId} left room ${chatId}`);
     })
+
+    socket.on("is-typing", ({ chatId }) => {
+      socket.to(chatId).emit("is-typing")
+    })
+
+    socket.on("not-typing", ({ chatId }) => {
+      socket.to(chatId).emit("not-typing");
+    });
+
 
     socket.on("disconnect", () => {
       console.log(`Socket disconnected: ${socket.id}`);

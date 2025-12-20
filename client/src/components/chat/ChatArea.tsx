@@ -1,7 +1,7 @@
 import type { ChatData } from "@/pages/Chat";
 import { ScrollArea } from "../ui/scroll-area";
 import { useAtom } from "jotai";
-import { chatMessagesAtom} from "@/atoms/atoms";
+import { chatMessagesAtom, showTypingIndicatorAtom} from "@/atoms/atoms";
 import { useEffect, useRef } from "react";
 import TypingIndicator from "./TypingIndicator";
 
@@ -34,6 +34,7 @@ const MessageBubble = ({isMe, message, createdAt}: MessageBubbleProps) => {
 const ChatArea = ({ chatData }: ChatAreaProps) => {
   const [messages, setMessages] = useAtom(chatMessagesAtom)
   const bottomRef = useRef<HTMLDivElement>(null)
+  const [showTypingIndicator] = useAtom(showTypingIndicatorAtom);
   // Loading
   if (!chatData) return <div></div>;
 
@@ -57,7 +58,7 @@ const ChatArea = ({ chatData }: ChatAreaProps) => {
     behavior: "smooth",
     block: "end",
   })
-}, [messages])
+}, [messages, showTypingIndicator])
   
   return (
     <div className="flex-1 overflow-hidden">
@@ -74,9 +75,7 @@ const ChatArea = ({ chatData }: ChatAreaProps) => {
             />
           );
         })}
-
-        <TypingIndicator />
-
+        {showTypingIndicator && <TypingIndicator />}
         <div ref={bottomRef} />
       </ScrollArea>
     </div>

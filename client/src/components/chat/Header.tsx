@@ -1,9 +1,9 @@
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Avatar, AvatarImage } from "@/components/ui/avatar";
 import { ChevronLeft } from "lucide-react";
 import { Separator } from "../ui/separator";
 import { useNavigate } from "react-router";
 import { useAtom } from "jotai";
-import { onlineUserIdAtom } from "@/atoms/atoms";
+import { onlineUserAtom } from "@/atoms/atoms";
 import type { ChatData } from "@/pages/Chat";
 
 type HeaderProps = {
@@ -11,7 +11,7 @@ type HeaderProps = {
 };
 
 const Header = ({ chatData }: HeaderProps) => {
-  const [onlineUserId] = useAtom(onlineUserIdAtom);
+  const [onlineUserId] = useAtom(onlineUserAtom);
 
   // Loading
   if (!chatData) return <div></div>;
@@ -50,7 +50,7 @@ const Header = ({ chatData }: HeaderProps) => {
           </div>
 
           <div className="text-muted-foreground text-sm">
-            {onlineUserId === otherUserId ? "Online" : "Offline"}
+            {onlineUserId? "Online" : "Offline"}
           </div>
         </div>
       </div>

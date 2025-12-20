@@ -2,12 +2,15 @@ import { Send, Smile } from "lucide-react";
 import { Input } from "../ui/input";
 import { useRef, useState } from "react";
 import EmojiPicker, { type EmojiClickData } from "emoji-picker-react";
+import { useSetAtom } from "jotai";
+import { isTypingAtom } from "@/atoms/atoms";
 
 const SendMessage = ({ sendMessage }: { sendMessage: (t: string) => void }) => {
   const [message, setMessage] = useState("");
-  const [check, setcheck] = useState("");
+  const setisTyping = useSetAtom(isTypingAtom);
   const [emojiPicker, setEmojiPicker] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
+  const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const handleSubmit = () => {
     if (!message.trim()) return;
@@ -35,9 +38,18 @@ const SendMessage = ({ sendMessage }: { sendMessage: (t: string) => void }) => {
 
     setMessage(next);
   };
+
+  const handleTyping = () => {
+    setisTyping(true);
+
+    timerRef.current && clearTimeout(timerRef.current);
+    timerRef.current = setTimeout(() => {
+      setisTyping(false)
+    }, 3000);
+
+  }
   return (
     <>
-      {message && <div>hlo ji</div>}
 
       {emojiPicker && (
         <EmojiPicker onEmojiClick={onEmojiCLick} theme="dark" height={320} />
@@ -46,7 +58,11 @@ const SendMessage = ({ sendMessage }: { sendMessage: (t: string) => void }) => {
         <Smile onClick={() => setEmojiPicker((v) => !v)} />
         <Input
           placeholder="Type a message"
-          onChange={(e) => setMessage(e.target.value)}
+          onChange={(e) => {
+            setMessage(e.target.value);
+            handleTyping();
+          }}
+          onBlur={()=>setisTyping(false)}
           onKeyDown={handleKeyDown}
           value={message}
           ref={inputRef}
