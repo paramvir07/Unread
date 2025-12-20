@@ -1,9 +1,10 @@
 import { Send, Smile } from "lucide-react";
 import { Input } from "../ui/input";
 import { useRef, useState } from "react";
-import EmojiPicker, { type EmojiClickData } from "emoji-picker-react";
+import EmojiPicker, { type EmojiClickData, Theme, Categories } from "emoji-picker-react";
 import { useSetAtom } from "jotai";
 import { isTypingAtom } from "@/atoms/atoms";
+
 
 const SendMessage = ({ sendMessage }: { sendMessage: (t: string) => void }) => {
   const [message, setMessage] = useState("");
@@ -25,7 +26,7 @@ const SendMessage = ({ sendMessage }: { sendMessage: (t: string) => void }) => {
     }
   };
 
-  const onEmojiCLick = (emojiData: EmojiClickData) => {
+  const onEmojiClick = (emojiData: EmojiClickData) => {
     const input = inputRef.current;
     if (!input) return;
 
@@ -37,6 +38,8 @@ const SendMessage = ({ sendMessage }: { sendMessage: (t: string) => void }) => {
     const next = message.slice(0, start) + emoji + message.slice(end);
 
     setMessage(next);
+
+    
   };
 
   const handleTyping = () => {
@@ -50,9 +53,22 @@ const SendMessage = ({ sendMessage }: { sendMessage: (t: string) => void }) => {
   }
   return (
     <>
-
       {emojiPicker && (
-        <EmojiPicker onEmojiClick={onEmojiCLick} theme="dark" height={320} />
+        <EmojiPicker
+          onEmojiClick={onEmojiClick}
+          theme={Theme.DARK}
+          height={320}
+          categories={[
+            { category: Categories.SMILEYS_PEOPLE, name: "Smileys & People" },
+            { category: Categories.ANIMALS_NATURE, name: "Animals & Nature" },
+            { category: Categories.FOOD_DRINK, name: "Food & Drink" },
+            { category: Categories.TRAVEL_PLACES, name: "Travel & Places" },
+            { category: Categories.ACTIVITIES, name: "Activities" },
+            { category: Categories.OBJECTS, name: "Objects" },
+            { category: Categories.SYMBOLS, name: "Symbols" },
+            { category: Categories.FLAGS, name: "Flags" },
+          ]}
+        />
       )}
       <div className="flex items-center gap-2 px-2 py-2 border-t">
         <Smile onClick={() => setEmojiPicker((v) => !v)} />
@@ -62,7 +78,7 @@ const SendMessage = ({ sendMessage }: { sendMessage: (t: string) => void }) => {
             setMessage(e.target.value);
             handleTyping();
           }}
-          onBlur={()=>setisTyping(false)}
+          onBlur={() => setisTyping(false)}
           onKeyDown={handleKeyDown}
           value={message}
           ref={inputRef}

@@ -4,10 +4,11 @@ import { prisma } from "../lib/prisma";
 import { verifyToken } from "@clerk/backend";
 import 'dotenv/config'
 
+const clientUrl = process.env.CLIENT_URL;
 export const setupSocket = (server: HttpServer) => {
   const io = new Server(server, {
     cors: {
-      origin: "http://localhost:5173",
+      origin: clientUrl,
       credentials: true,
     },
   });
@@ -20,7 +21,7 @@ export const setupSocket = (server: HttpServer) => {
     try {
       const verified = await verifyToken(token, {
         secretKey: process.env.CLERK_SECRET_KEY,
-        authorizedParties: ["http://localhost:5173"]
+        authorizedParties: [`${clientUrl}`]
       });
       socket.data.clerkId = verified.sub;
       return next();

@@ -8,13 +8,13 @@ import { createServer } from "http";
 import { clerkMiddleware } from '@clerk/express'
 import cors from 'cors';
 import { setupSocket } from "./src/socket/socketHandler";
-const port = 3000;
+const port = process.env.PORT;
 const app = express();
 const server = createServer(app);
 
 app.use(
   cors({
-    origin: "http://localhost:5173",
+    origin: process.env.CLIENT_URL,
     credentials: true,
   })
 )

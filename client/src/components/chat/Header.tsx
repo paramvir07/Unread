@@ -12,8 +12,6 @@ const Header = ({ chatData }: HeaderProps) => {
   // Loading
   if (!chatData) return <div></div>;
 
-  console.log(`chat data from header: ${chatData}`);
-
   const chat = chatData?.chat;
 
   const loggedInUser = chatData?.userId;
