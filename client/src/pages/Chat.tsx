@@ -15,6 +15,7 @@ import type { User } from "./Home";
 import { useAuth } from "@clerk/clerk-react";
 import type { Socket } from "socket.io-client";
 import { MySkeleton } from "@/components/ui/MySkeleton";
+import { useAuthedApi } from "@/api/authedApi";
 
 type ChatUser = {
   id: string;
@@ -63,13 +64,13 @@ const Chat = () => {
   const [isTyping] = useAtom(isTypingAtom);
   const setShowTypingIndicator = useSetAtom(showTypingIndicatorAtom);
   const apiUrl = import.meta.env.VITE_API_URL;
+  const api = useAuthedApi();
 
   const loadChat = async () => {
     try {
-      const response = await axios.post(
+      const response = await api.post(
         `${apiUrl}/api/user/loadChat`,
-        { chatId },
-        { withCredentials: true }
+        { chatId }
       );
       const data = response.data;
       setChatData(data);

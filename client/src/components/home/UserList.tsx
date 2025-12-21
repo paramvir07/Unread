@@ -15,6 +15,7 @@ import type { User } from "@/pages/Home";
 import { chatIdAtom, otherUserIdAtom } from "@/atoms/atoms";
 import { useSetAtom } from "jotai";
 import { MySkeleton } from "../ui/MySkeleton";
+import { useAuthedApi } from "@/api/authedApi";
 
 type ChatHomeProps = {
   users: User[];
@@ -27,6 +28,7 @@ const UserList = ({ users }: ChatHomeProps) => {
   const navigate = useNavigate();
   const { isLoaded, isSignedIn } = useUser();
   const apiUrl = import.meta.env.VITE_API_URL;
+  const api = useAuthedApi();
 
   const getChatId = async (otherUserId: string) => {
     // Hard block clicks when signed out (important)
@@ -35,10 +37,9 @@ const UserList = ({ users }: ChatHomeProps) => {
     setOtherUserId(otherUserId);
 
     try {
-      const response = await axios.post(
+      const response = await api.post(
         `${apiUrl}/api/user/getChatId`,
-        { otherUserId },
-        { withCredentials: true }
+        { otherUserId }
       );
 
       const chatId = response.data?.chat?.id;
