@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
-import axios from "axios";
 import UserList from "@/components/home/UserList";
 import { useUser } from "@clerk/clerk-react";
+import { useAuthedApi } from "@/api/authedApi";
 export type User = {
   id: string;
   clerkId: string,
@@ -16,9 +16,11 @@ const Home = () => {
   const {isLoaded, isSignedIn } = useUser();
   const [users, setUsers] = useState<User[]>([]);
   const apiUrl = import.meta.env.VITE_API_URL;
+  const api = useAuthedApi();
   const getUsers = async () => {
     try {
-      const response = await axios.get(`${apiUrl}/api/getUsers`, {withCredentials: true});
+      
+      const response = await api.get(`${apiUrl}/api/getUsers`);
       const data = response.data;
       setUsers(data.users);
     } catch (error) {
