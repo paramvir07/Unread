@@ -7,7 +7,6 @@ import ChatArea from "@/components/chat/ChatArea";
 import Header from "@/components/chat/Header";
 import SendMessage from "@/components/chat/SendMessage";
 import {  getSocket } from "@/socket/socket";
-import axios from "axios";
 import { useAtom, useSetAtom } from "jotai";
 import { useEffect, useRef, useState } from "react";
 import { useParams } from "react-router";

@@ -10,7 +10,6 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { Input } from "@/components/ui/input";
 import { Avatar, AvatarImage } from "@/components/ui/avatar";
 import { useNavigate } from "react-router";
-import axios from "axios";
 import type { User } from "@/pages/Home";
 import { chatIdAtom, otherUserIdAtom } from "@/atoms/atoms";
 import { useSetAtom } from "jotai";
