@@ -15,6 +15,7 @@ const server = createServer(app);
 
 const clientUrl = process.env.CLIENT_URL;
 
+app.use(clerkMiddleware());
 app.use(
   cors({
     origin: isProd
@@ -32,7 +33,6 @@ setupSocket(server);
 
 app.use(morgan(isProd ? "combined" : "dev"));
 app.use(helmet());
-app.use(clerkMiddleware());
 app.use(express.json());
 
 app.use("/api", userRoute);
