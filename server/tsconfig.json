@@ -7,6 +7,9 @@
     "moduleDetection": "force",
     "jsx": "react-jsx",
     "allowJs": true,
+    "paths": {
+      "@prisma/client": ["./generated/prisma/client"]
+    },
 
     // Bundler mode
     "moduleResolution": "bundler",
