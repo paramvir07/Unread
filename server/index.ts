@@ -32,6 +32,7 @@ setupSocket(server);
 
 app.use(morgan(isProd ? "combined" : "dev"));
 app.use(helmet());
+app.use(clerkMiddleware());
 app.use(express.json());
 
 app.use("/api", userRoute);
