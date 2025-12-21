@@ -5,6 +5,7 @@
   "private": true,
   "scripts": {
     "dev": "bun --watch run index.ts",
+    "postinstall": "prisma generate",
     "ngrok": "bun run --watch dev/ngrok.ts",
     "start": "bun run index.ts"
   },
