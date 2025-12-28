@@ -24,7 +24,7 @@ const MessageBubble = ({isMe, message, createdAt}: MessageBubbleProps) => {
     minute: "2-digit",
   })
   return (
-    <div className={` flex flex-col px-2 py-0.5 w-fit rounded-sm mb-4 ${isMe ? "bg-primary/70" : "bg-muted-foreground ml-auto"}`}>
+    <div className={` flex flex-col px-2 py-0.5 w-fit rounded-sm mb-4 ${isMe ? "bg-muted-foreground ml-auto" : "bg-primary/70"}`}>
       <div className="text-card py-1">{message}</div>
       <div className="ml-auto text-muted text-[13px]">{time}</div>
     </div>
